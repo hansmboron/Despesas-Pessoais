@@ -1,4 +1,5 @@
 import 'package:despesas_pessoais/pages/home.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,6 +15,7 @@ class ExpensesApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
         accentColor: Colors.indigo,
+        textTheme: GoogleFonts.rubikTextTheme(),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Home(),
