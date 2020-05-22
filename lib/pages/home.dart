@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:despesas_pessoais/components/chart.dart';
 import 'package:despesas_pessoais/components/transaction-form.dart';
 import 'package:despesas_pessoais/components/transaction-list.dart';
 import 'package:despesas_pessoais/models/transaction.dart';
@@ -12,7 +13,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   _openFormModal(BuildContext context) {
-    showModalBottomSheet(
+    showDialog(
         context: context,
         builder: (_) {
           return TransactionForm(_addTransaction);
@@ -22,29 +23,42 @@ class _HomeState extends State<Home> {
   final List<Transaction> _transaction = [
     // Transaction(
     //   id: 't1',
-    //   title: 'Novo tenis de corrida',
-    //   value: 310.76,
-    //   dateTime: DateTime.now(),
+    //   title: 'Tenis',
+    //   value: 190.99,
+    //   dateTime: DateTime.now().subtract(Duration(days: 3)),
     // ),
     // Transaction(
     //   id: 't2',
     //   title: 'Conta de luz',
     //   value: 211.13,
-    //   dateTime: DateTime.now(),
+    //   dateTime: DateTime.now().subtract(Duration(days: 1)),
     // ),
   ];
 
-  _addTransaction(String title, double value) {
+  // filtrar lista para pegar só dos últimos 7 dias
+  List<Transaction> get _recentTransactions {
+    return _transaction.where((tr) {
+      return tr.dateTime.isAfter(DateTime.now().subtract(Duration(days: 7)));
+    }).toList();
+  }
+
+  _addTransaction(String title, double value, DateTime dateTime) {
     final newTransaction = Transaction(
       id: Random().nextDouble().toString(),
       title: title,
       value: value,
-      dateTime: DateTime.now(),
+      dateTime: dateTime,
     );
     setState(() {
       _transaction.add(newTransaction);
     });
     Navigator.of(context).pop();
+  }
+
+  _removeTransaction(String id) {
+    setState(() {
+      _transaction.removeWhere((tr) => tr.id == id);
+    });
   }
 
   @override
@@ -62,19 +76,16 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
+      backgroundColor: Colors.grey[300],
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: Card(
-                child: Text('Gráfico'),
-                elevation: 5.0,
-              ),
+            Chart(recentTransactions: _recentTransactions),
+            TransactionList(
+              transactions: _transaction,
+              onRemove: _removeTransaction,
             ),
-            TransactionList(_transaction),
-            // TransactionForm(_addTransaction),
           ],
         ),
       ),

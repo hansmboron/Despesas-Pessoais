@@ -4,13 +4,13 @@ import 'package:intl/intl.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
+  final void Function(String) onRemove;
 
-  const TransactionList(this.transactions);
+  const TransactionList({this.transactions, this.onRemove});
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black12,
-      height: MediaQuery.of(context).size.height / 1.5,
+      height: MediaQuery.of(context).size.height / 1.69,
       child: transactions.isEmpty
           ? Column(
               children: <Widget>[
@@ -22,50 +22,53 @@ class TransactionList extends StatelessWidget {
                 Image.asset(
                   'assets/img/waiting.png',
                   height: MediaQuery.of(context).size.height / 3.0,
-                  color: Colors.grey,
                 )
               ],
             )
           : ListView.builder(
+              physics: BouncingScrollPhysics(),
+              padding: EdgeInsets.only(bottom: 16.0),
               itemCount: transactions.length,
               itemBuilder: (ctx, index) {
                 final tr = transactions[index];
                 return Card(
-                  elevation: 5.0,
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Theme.of(context).primaryColor)),
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          'R\$ ' + tr.value.toStringAsFixed(2),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.0,
-                              color: Theme.of(context).primaryColor),
+                  elevation: 4.0,
+                  margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                  child: ListTile(
+                    leading: Container(
+                      width: 90,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: FittedBox(
+                          fit: BoxFit.fitWidth,
+                          child: Text(
+                            'R\$${tr.value.toStringAsFixed(2)}',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            tr.title,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                                color: Theme.of(context).primaryColor),
-                          ),
-                          Text(DateFormat('d/MM/yy h:m:s').format(tr.dateTime),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ))
-                        ],
-                      )
-                    ],
+                    ),
+                    title: Text(
+                      tr.title,
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      DateFormat('dd/MM/y').format(tr.dateTime),
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      color: Theme.of(context).errorColor,
+                      onPressed: () => onRemove(tr.id),
+                    ),
                   ),
                 );
               },
